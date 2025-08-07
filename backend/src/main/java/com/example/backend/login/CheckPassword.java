@@ -1,20 +1,23 @@
 package com.example.backend.login;
 
-import com.example.backend.database.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Component;
+
+import com.example.backend.database.DBConnection;
 
 @Component
 public class CheckPassword {
     @Autowired
     private DBConnection dbConnection;
 
-    public boolean check(String username, String passwordInput) {
-        String query = "SELECT Password FROM Users WHERE UserName = ?";
+    public String check(String username, String passwordInput) {
+        String query = "SELECT PasswordHashed, Email FROM Users WHERE UserName = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -23,16 +26,22 @@ public class CheckPassword {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String passwordInDb = rs.getString("Password");
-                return passwordInput.equals(passwordInDb); // So sánh trực tiếp
+                String passwordInDb = rs.getString("PasswordHashed");
+                String email = rs.getString("Email");
+                if (BCrypt.checkpw(passwordInput, passwordInDb)){
+                    System.out.println("Đăng nhập thành công!!" + LocalDateTime.now());
+                    return email;
+                }else{
+                    System.out.println("sai tài khoản hoặc mật khẩu!!");
+                }
+
             } else {
                 System.out.println("⚠️ Không tìm thấy người dùng: " + username);
-                return false;
             }
 
         } catch (Exception e) {
             System.err.println("❌ Lỗi kiểm tra mật khẩu: " + e.getMessage());
-            return false;
         }
+        return null;
     }
 }

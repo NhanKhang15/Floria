@@ -17,11 +17,15 @@ public class Login {
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody LoginRequest request) {
-        boolean success = checkPassword.check(request.getUsername(), request.getPassword());
+        String email = checkPassword.check(request.getUsername(), request.getPassword());
+        boolean success = (email != null); // hơi ngoooo
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", success);
-        response.put("message", success ? "Login thành công!" : "Sai tài khoản hoặc mật khẩu!");
+        response.put("message", success ? "Login thành công!!!!" : "Sai tài khoản hoặc mật khẩu!");
+        response.put("username", success ? request.getUsername() : "null");
+        response.put("email", success ? email : "null");
+        
 
         return response;
     }    

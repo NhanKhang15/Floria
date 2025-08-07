@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'signup_screen.dart';
+import '../signup/signup_screen.dart';
+import '../../homepage/HomePage.dart';
+import '../../widgets/user_account.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:frontend/constants/config.dart';
 
 class LoginScreen extends StatefulWidget{
   const LoginScreen({super.key});
@@ -15,12 +18,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
+  
+  UserAccount? _userAccount; 
+
   String result = "";
   bool _obscurePassword = true;
 
   Future<void> login() async{
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8080/login'),
+      final response =await http.post(
+      Uri.parse('${AppConfig.baseUrl}/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'username': _userController.text,
@@ -29,10 +35,26 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     final data = jsonDecode(response.body);
-    setState(() {
-      result = data['message'];
-    });
+    // setState(() {
+    //   result = data['message'];
+    // });
+
+  if (data["success"] == true) {
+      setState(() {
+        _userAccount = UserAccount.fromJson(data); // ✅ cập nhật state
+      });
+
+    // 👉 Sau đó chuyển hướng sang MainPage
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage(userAccount: _userAccount)),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(data["message"] ?? "Sai tài khoản hoặc mật khẩu")),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 16),
 //|||||||||||||||||||||||||||||||||||||||||||||||||||
               Container(
-                width: 400,
+                width: 370,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,

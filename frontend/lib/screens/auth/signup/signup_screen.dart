@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'login_screen.dart';
+import '../login/login_screen.dart';
+import 'package:frontend/constants/config.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -29,7 +30,7 @@ class _SignupScreenState extends State<SignupScreen> {
       isLoading = true;
     });
 
-    var url = Uri.parse('http://localhost:8080/signup');
+    var url = Uri.parse('${AppConfig.baseUrl}/signup');
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -88,7 +89,7 @@ class _SignupScreenState extends State<SignupScreen> {
               Text('Ứng dụng chăm sóc sức khỏe phụ nữ'),
               SizedBox(height: 16),
               Container(
-                width: 400,
+                width: 370,
                 padding: EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
