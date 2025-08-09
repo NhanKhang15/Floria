@@ -13,8 +13,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Tracking(),
-      // home: SignupScreen(),
+      // home: Tracking(),
+      home: SignupScreen(),
     );
   }
 }

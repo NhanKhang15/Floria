@@ -1,54 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/widgets/logout_button.dart';
-import 'menu_item_widget.dart';
 import 'user_account.dart';
-import 'package:frontend/screens/auth/login/login_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class SidebarMenu extends StatefulWidget{
-  const SidebarMenu ({super.key, required this.userAccount});
+class SidebarMenu extends StatefulWidget {
+  const SidebarMenu({
+    super.key,
+    required this.userAccount,
+    required this.selectedIndex,
+    required this.onItemSelected,
+  });
 
   final UserAccount userAccount;
+  final int selectedIndex;
+  final Function(int) onItemSelected;
 
   @override
   State<StatefulWidget> createState() => _SidebarMenuState();
 }
 
 class _SidebarMenuState extends State<SidebarMenu> {
-  int _selectedIndex = 0;
   late UserAccount _userAccount;
   final List<Map<String, dynamic>> _menuItems = [
-    {
-      'icon': Icons.home,'title': 'Trang chủ',
-      'onTap': () {
-        // Handle home tap
-      },
-    },
-    {
-      'icon': Icons.calendar_month,'title': 'Theo dõi vòng kinh',
-      'onTap': () {
-        // Handle settings tap
-      },
-    },
-    {
-      'icon': Icons.menu_book,'title': 'Tư vấn kiến thức',
-      'onTap': () {
-        // Handle logout tap
-      },
-    },
-    {
-      'icon': Icons.person_search,'title': 'Tư vấn chuyên gia',
-      'onTap': () {
-        // Handle logout tap
-      },
-    },
-    {
-      'icon': Icons.settings,'title': 'Quản lý tài khoản',
-      'onTap': () {
-        // Handle logout tap
-      },
-    },
+    {'icon': Icons.home, 'title': 'Trang chủ', 'onTap': null},
+    {'icon': Icons.calendar_month, 'title': 'Theo dõi vòng kinh', 'onTap': null},
+    {'icon': Icons.menu_book, 'title': 'Tư vấn kiến thức', 'onTap': null},
+    {'icon': Icons.person_search, 'title': 'Tư vấn chuyên gia', 'onTap': null},
+    {'icon': Icons.settings, 'title': 'Quản lý tài khoản', 'onTap': null},
   ];
+
   @override
   void initState() {
     super.initState();
@@ -64,7 +43,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
         padding: EdgeInsets.symmetric(vertical: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children:[
+          children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -99,21 +78,28 @@ class _SidebarMenuState extends State<SidebarMenu> {
                   ),
                 ),
                 SizedBox(height: 30),
-
-                //Menu items
-                ...MenuItemWidget.buildMenuItems(
-                  menuItems: _menuItems,
-                  selectedIndex: _selectedIndex,
-                  onItemTap: (index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                ),
-
+                ..._menuItems.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final item = entry.value;
+                  return ListTile(
+                    leading: Icon(
+                      item['icon'],
+                      color: widget.selectedIndex == index ? Colors.pink : Colors.grey,
+                    ),
+                    title: Text(
+                      item['title'],
+                      style: TextStyle(
+                        color: widget.selectedIndex == index ? Colors.pink : Colors.black,
+                      ),
+                    ),
+                    selected: widget.selectedIndex == index,
+                    onTap: () {
+                      widget.onItemSelected(index); // Call the callback
+                    },
+                  );
+                }).toList(),
               ],
             ),
-
             Column(
               children: [
                 Divider(),
@@ -127,10 +113,17 @@ class _SidebarMenuState extends State<SidebarMenu> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  title: Text((_userAccount != null && _userAccount.name.isNotEmpty) ? _userAccount.name : "Người dùng"),
-                  subtitle: Text((_userAccount != null && _userAccount.email.isNotEmpty) ? _userAccount.email : "Đang tải..."),
+                  title: Text(
+                    (_userAccount != null && _userAccount.name.isNotEmpty)
+                        ? _userAccount.name
+                        : "Người dùng",
+                  ),
+                  subtitle: Text(
+                    (_userAccount != null && _userAccount.email.isNotEmpty)
+                        ? _userAccount.email
+                        : "Đang tải...",
+                  ),
                 ),
-
                 const LogoutButton(),
               ],
             ),

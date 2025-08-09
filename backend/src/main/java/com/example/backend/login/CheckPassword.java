@@ -17,7 +17,7 @@ public class CheckPassword {
     private DBConnection dbConnection;
 
     public String check(String username, String passwordInput) {
-        String query = "SELECT PasswordHashed, Email FROM Users WHERE UserName = ?";
+        String query = "SELECT password_hashed, email FROM Users WHERE name = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -26,8 +26,8 @@ public class CheckPassword {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String passwordInDb = rs.getString("PasswordHashed");
-                String email = rs.getString("Email");
+                String passwordInDb = rs.getString("password_hashed");
+                String email = rs.getString("email");
                 if (BCrypt.checkpw(passwordInput, passwordInDb)){
                     System.out.println("Đăng nhập thành công!!" + LocalDateTime.now());
                     return email;

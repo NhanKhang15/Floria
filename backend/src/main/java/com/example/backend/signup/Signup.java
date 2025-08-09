@@ -18,7 +18,7 @@ public class Signup {
     private HashPassword hashPassword;
 
     public boolean register(SignupRequest request) {
-        String insertQuery = "INSERT INTO Users (UserName, Email, Password, PasswordHashed, PhoneNumber) VALUES (?, ?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO Users (name, email, password_hashed, phone) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
@@ -27,9 +27,8 @@ public class Signup {
 
             stmt.setString(1, request.getUsername());
             stmt.setString(2, request.getEmail());
-            stmt.setString(3, request.getPassword()); // Lưu cả raw nếu bạn muốn debug
-            stmt.setString(4, hashed); // Lưu hash để dùng sau
-            stmt.setString(5, request.getPhoneNumber());
+            stmt.setString(3, hashed);
+            stmt.setString(4, request.getPhoneNumber());
 
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
